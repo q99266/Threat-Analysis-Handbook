@@ -1,25 +1,14 @@
 # T1040-Linux-网络嗅探
-
 ## 来自ATT&CK的描述
-
 网络嗅探是指使用系统上的网络接口来监视或捕获通过有线或无线连接发送的信息。攻击者可以将网络接口置于混杂模式以通过网络被动地访问传输中的数据，或者使用跨接端口来捕获更大量的数据。
-
 通过该技术可以捕获的数据包括用户凭证，尤其是通过不安全的未加密协议发送的凭证；网络嗅探还可以获取到配置细节，例如运行服务，版本号以及后续横向移动或防御逃避活动所需的其他网络特征（例如：IP寻址，主机名，VLAN ID）。
-
 ## 测试案例
-
 tcpdump -c 5 -nnni #{网卡接口}
-
 tshark -c 5 -i #{网卡接口}
-
 ## 检测日志
-
 linux /var/log/message （值得注意的是：Ubuntu下默认不开启message日志，需要手动开启）
-
 ## 测试复现
-
 ### 场景一
-
 root@icbc:~# tcpdump -c 5 -nnni ens33
 tcpdump: verbose output suppressed, use -v or -vv for full protocol decode
 listening on ens33, link-type EN10MB (Ethernet), capture size 262144 bytes
@@ -31,9 +20,7 @@ listening on ens33, link-type EN10MB (Ethernet), capture size 262144 bytes
 5 packets captured
 5 packets received by filter
 0 packets dropped by kernel
-
 ### 场景二
-
 root@icbc:~# tshark -c 5 -i ens33
 Running as user "root" and group "root". This could be dangerous.
 Capturing on 'ens33'
@@ -43,37 +30,21 @@ Capturing on 'ens33'
     4 0.038758293 192.168.66.2 → 192.168.66.148 DNS 132 Standard query response 0xe349 A connectivity-check.ubuntu.com A 35.224.99.156 A 35.222.85.5 OPT
     5 0.039670671 192.168.66.148 → 35.222.85.5  TCP 74 57812 → 80 [SYN] Seq=0 Win=64240 Len=0 MSS=1460 SACK_PERM=1 TSval=136575048 TSecr=0 WS=128
 5 packets captured
-
 ## 测试留痕
-
 ### 场景1
-
 message日志
-
 Jul 19 10:37:33 icbc kernel: [  298.396406] device ens33 entered promiscuous mode
-
 ### 场景2
-
 message日志
-
 Jul 19 10:47:42 icbc systemd[1]: Started Cleanup of Temporary Directories.
 Jul 19 10:47:50 icbc kernel: [  915.199848] device ens33 left promiscuous mode
 Jul 19 10:47:50 icbc start.sh[734]: 2019-07-19 10:47:50,165: DEBUG helpers.application.health RAM: 65MB
-
 ## 检测规则/思路
-
 ### splunk检测规则
-
 index=linux sourcetype=syslog entered promiscuous mode | table host,message
-
 index=linux sourcetype=syslog left promiscuous mode | table host,message
-
 ### 建议
-
 暂无
-
 ## 参考推荐
-
 MITRE-ATT&CK-T1040
-
 <https://attack.mitre.org/techniques/T1040/>
